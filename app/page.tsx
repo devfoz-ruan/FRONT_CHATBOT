@@ -10,10 +10,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-yellow-400 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-br from-green-500 to-yellow-400 rounded-lg flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-yellow-600">
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-green-600 to-yellow-600">
                 Colla
               </span>
             </div>
@@ -41,7 +41,7 @@ export default function Home() {
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 mb-8 leading-tight">
             Unindo Equipes, <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 via-yellow-500 to-green-500 animate-gradient-x">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-green-500 via-yellow-500 to-green-500 animate-gradient-x">
               Transformando Atendimentos
             </span>
           </h1>
@@ -111,7 +111,7 @@ export default function Home() {
       {/* Value Proposition */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-8 md:p-16 text-white overflow-hidden relative">
+          <div className="bg-linear-to-br from-green-600 to-green-800 rounded-3xl p-8 md:p-16 text-white overflow-hidden relative">
             <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
             <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
 
@@ -152,7 +152,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-yellow-400 rounded-md flex items-center justify-center">
+              <div className="w-6 h-6 bg-linear-to-br from-green-500 to-yellow-400 rounded-md flex items-center justify-center">
                 <Users className="w-3 h-3 text-white" />
               </div>
               <span className="text-lg font-bold text-gray-900">Colla</span>

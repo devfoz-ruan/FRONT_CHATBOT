@@ -19,8 +19,8 @@ export default function Sidebar() {
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Visão Geral", href: "/dashboard" },
-        { icon: MessageSquare, label: "Demandas", href: "/dashboard/demands" },
-        { icon: Users, label: "Meu Grupo", href: "/dashboard/group" },
+        { icon: MessageSquare, label: "Demandas", href: "/mensages" },
+        { icon: Users, label: "Meu Grupo", href: "/group" },
         { icon: Settings, label: "Configurações", href: "/dashboard/settings" },
     ];
 
@@ -36,10 +36,10 @@ export default function Sidebar() {
             <div className="h-16 flex items-center justify-between px-4 border-b border-gray-50">
                 {!collapsed && (
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-yellow-400 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-linear-to-br from-green-500 to-yellow-400 rounded-lg flex items-center justify-center">
                             <Users className="w-5 h-5 text-white" />
                         </div>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-yellow-600">
+                        <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-green-600 to-yellow-600">
                             Colla
                         </span>
                     </div>
