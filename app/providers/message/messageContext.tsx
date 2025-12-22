@@ -1,6 +1,6 @@
 "use client";
 
-import { Message } from "@/app/models/message"
+import { Message } from "@/app/models/Mensagem"
 import { SetStateAction } from "react"
 import { initialState } from "./initialState"
 import { createContext } from "react"

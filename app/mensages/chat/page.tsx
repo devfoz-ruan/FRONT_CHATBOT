@@ -2,39 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Send, Paperclip, Smile, Image as ImageIcon, MoreVertical, Phone, Video } from "lucide-react";
-
-interface Message {
-    id: number;
-    text: string;
-    sender: string;
-    timestamp: string;
-    isMe: boolean;
-}
+import { Message } from "@/app/models/Mensagem";
+import { Client } from "@/app/models/Client";
 
 export default function ChatPage() {
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: 1,
-            text: "Olá! Tudo bem?",
-            sender: "João da Silva",
-            timestamp: "10:00",
-            isMe: false,
-        },
-        {
-            id: 2,
-            text: "Oi João! Tudo ótimo por aqui. E com você?",
-            sender: "Eu",
-            timestamp: "10:02",
-            isMe: true,
-        },
-        {
-            id: 3,
-            text: "Tudo certo também. Viu a nova atualização do projeto?",
-            sender: "João da Silva",
-            timestamp: "10:05",
-            isMe: false,
-        },
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -50,11 +22,13 @@ export default function ChatPage() {
         if (newMessage.trim() === "") return;
 
         const message: Message = {
-            id: messages.length + 1,
-            text: newMessage,
-            sender: "Eu",
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isMe: true,
+            texto: newMessage,
+            idGrupo: 22,
+            chatId: '272485710860428@lid',
+            sessionId: "default",
+            timestamp: new Date(),
+            tempoEnvio: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isVendedor: true
         };
 
         setMessages([...messages, message]);
@@ -94,21 +68,21 @@ export default function ChatPage() {
             <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#f8fafc]">
                 {messages.map((msg) => (
                     <div
-                        key={msg.id}
-                        className={`flex ${msg.isMe ? "justify-end" : "justify-start"}`}
+                        key={msg.chatId + msg.timestamp}
+                        className={`flex ${msg.isVendedor ? "justify-end" : "justify-start"}`}
                     >
                         <div
-                            className={`max-w-[70%] rounded-2xl p-4 shadow-sm ${msg.isMe
-                                    ? "bg-green-600 text-white rounded-tr-none"
-                                    : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
+                            className={`max-w-[70%] rounded-2xl p-4 shadow-sm ${msg.isVendedor
+                                ? "bg-green-600 text-white rounded-tr-none"
+                                : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
                                 }`}
                         >
-                            <p className="text-sm leading-relaxed">{msg.text}</p>
+                            <p className="text-sm leading-relaxed">{msg.texto}</p>
                             <p
-                                className={`text-[10px] mt-2 text-right ${msg.isMe ? "text-green-100" : "text-gray-400"
+                                className={`text-[10px] mt-2 text-right ${msg.isVendedor ? "text-green-100" : "text-gray-400"
                                     }`}
                             >
-                                {msg.timestamp}
+                                {msg.tempoEnvio}
                             </p>
                         </div>
                     </div>
@@ -144,8 +118,8 @@ export default function ChatPage() {
                         <button
                             onClick={handleSendMessage}
                             className={`p-2 rounded-xl transition-all ${newMessage.trim()
-                                    ? "bg-green-600 text-white shadow-lg shadow-green-200 hover:bg-green-700"
-                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                ? "bg-green-600 text-white shadow-lg shadow-green-200 hover:bg-green-700"
+                                : "bg-gray-200 text-gray-400 cursor-not-allowed"
                                 }`}
                             disabled={!newMessage.trim()}
                         >

@@ -17,7 +17,7 @@ export default function FeedPost({ author, content, timestamp, likes, comments }
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-100 to-yellow-100 flex items-center justify-center border-2 border-white shadow-sm">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-green-100 to-yellow-100 flex items-center justify-center border-2 border-white shadow-sm">
                         {author.avatar ? (
                             <img src={author.avatar} alt={author.name} className="w-full h-full rounded-full object-cover" />
                         ) : (

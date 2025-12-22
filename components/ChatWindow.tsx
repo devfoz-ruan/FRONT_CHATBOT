@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { Send, Paperclip, Smile, Image as ImageIcon, MoreVertical, Phone, Video, X, Minimize2 } from "lucide-react";
 import { getSocket } from "@/app/socket";
 import type { Client } from "@/app/models/Client";
-import type { Message } from "@/app/models/message";
+import type { Message } from "@/app/models/Mensagem";
 import { useMessageContext } from "@/app/providers/message/useMessageContext";
 
 interface ChatWindowProps {
@@ -14,7 +14,7 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ client, onClose }: ChatWindowProps) {
     const { msgs, setMsgs } = useMessageContext();
-
+    const idGrupo = 22;
     const [messageText, setMessageText] = useState("");
     const socketConnection = getSocket();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -24,38 +24,40 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
     };
 
     useEffect(() => {
-        socketConnection.emit("join", client.id)
+        socketConnection.emit("join", client.chatId)
         socketConnection.on("roomMessage", (message: Message) => {
+            console.log(message)
             setMsgs((prev) => [...prev, message]);
         });
         scrollToBottom();
         return () => {
-
             socketConnection.off("roomMessage");
-            socketConnection.emit("leave", client.id)
+            socketConnection.emit("leave", client.chatId)
         }
-    }, [client.id]);
+    }, [client.chatId]);
 
-    const handleSendMessage = (roomId: number) => {
+    const handleSendMessage = (roomId: string) => {
         if (messageText.trim() === "") return;
 
         const message: Message = {
-            id: new Date().getTime(),
-            text: messageText,
-            sender: "Eu",
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isMe: true,
+            texto: messageText,
+            idGrupo: 22,
+            chatId: client.chatId,
+            sessionId: "default",
+            timestamp: new Date(),
+            isVendedor: true,
+            tempoEnvio: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         console.log(roomId)
+        console.log(msgs)
         socketConnection.emit("sendMessage", {
-            roomId,
+            roomId: client.chatId,
             message
-        })
-        setMsgs([...msgs, message]);
+        });
         setMessageText("");
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, clientid: number) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, clientid: string) => {
         if (e.key === "Enter") {
             handleSendMessage(clientid);
         }
@@ -71,13 +73,13 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
                             {client.avatar}
                         </div>
                         <span className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border-2 border-white ${client.status === 'online' ? 'bg-green-500' :
-                            client.status === 'busy' ? 'bg-red-500' : 'bg-gray-300'
+                            client.status === "offline" ? 'bg-red-500' : 'bg-gray-300'
                             }`}></span>
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900 text-sm">{client.name}</h3>
                         <p className="text-xs text-green-600 flex items-center gap-1">
-                            {client.status === 'online' ? 'Online' : client.status}
+                            {client.status}
                         </p>
                     </div>
                 </div>
@@ -89,29 +91,34 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
 
             {/* msgs Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f8fafc]">
-                {msgs.map((msg) => (
-                    <div
-                        key={msg.id}
-                        className={`flex ${msg.isMe ? "justify-end" : "justify-start"}`}
-                    >
+                {msgs.map((msg) => {
+
+                    if (msg.chatId === client.chatId) return (
                         <div
-                            className={`max-w-[80%] rounded-2xl p-3 shadow-sm ${msg.isMe
-                                ? "bg-green-600 text-white rounded-tr-none"
-                                : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
-                                }`}
+                            key={msg.timestamp.toString()}
+                            className={`flex ${msg.isVendedor ? "justify-end" : "justify-start"}`}
                         >
-                            <p className="text-sm leading-relaxed">{msg.text}</p>
-                            <p
-                                className={`text-[10px] mt-1 text-right ${msg.isMe ? "text-green-100" : "text-gray-400"
+                            <div
+                                className={`max-w-[80%] rounded-2xl p-3 shadow-sm ${msg.isVendedor
+                                    ? "bg-green-600 text-white rounded-tr-none"
+                                    : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
                                     }`}
                             >
-                                {msg.timestamp}
-                            </p>
+                                <p className="text-sm leading-relaxed">{msg.texto}</p>
+                                <p
+                                    className={`text-[10px] mt-1 text-right ${msg.isVendedor ? "text-green-100" : "text-gray-400"
+                                        }`}
+                                >
+                                    {msg.tempoEnvio}
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    )
+                })}
                 <div ref={messagesEndRef} />
             </div>
+
+
 
             {/* Input Area */}
             <div className="bg-white p-3 border-t border-gray-100">
@@ -120,12 +127,12 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
                         type="text"
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(e, client.id)}
+                        onKeyDown={(e) => handleKeyDown(e, client.chatId)}
                         placeholder="Mensagem..."
                         className="flex-1 bg-transparent border-none focus:ring-0 text-gray-700 placeholder-gray-400 text-sm px-2"
                     />
                     <button
-                        onClick={() => handleSendMessage(client.id)}
+                        onClick={() => handleSendMessage(client.chatId)}
                         className={`p-1.5 rounded-lg transition-all ${messageText.trim()
                             ? "bg-green-600 text-white shadow-md hover:bg-green-700"
                             : "text-gray-400"

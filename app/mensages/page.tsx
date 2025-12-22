@@ -5,6 +5,7 @@ import NewPostInput from "@/components/NewPostInput";
 import ChatWindow from "@/components/ChatWindow";
 import { Search, Filter } from "lucide-react";
 import { useState } from "react";
+import { Client } from "../models/Client";
 
 export default function MessagesPage() {
     const [selectedClient, setSelectedClient] = useState<any>(null);
@@ -34,12 +35,10 @@ export default function MessagesPage() {
         }
     ];
 
-    const clients = [
-        { id: 1, name: "Joao da Silva", status: "online", avatar: "TS" },
-        { id: 2, name: "Grupo Alpha", status: "offline", avatar: "GA" },
-        { id: 3, name: "Beta Inc", status: "online", avatar: "BI" },
-        { id: 4, name: "Delta Force", status: "busy", avatar: "DF" },
-        { id: 5, name: "Omega Corp", status: "online", avatar: "OC" },
+    const clients: Client[] = [
+        { name: "Ruan 22", status: "online", avatar: "TS", chatId: "chat_003" },
+        { name: "Ruan 17", status: "offline", avatar: "GA", chatId: "272485710860428" },
+
     ];
 
     return (
@@ -97,7 +96,7 @@ export default function MessagesPage() {
                         <div className="space-y-4">
                             {clients.map((client) => (
                                 <div
-                                    key={client.id}
+                                    key={client.chatId}
                                     onClick={() => setSelectedClient(client)}
                                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer group"
                                 >
@@ -106,7 +105,7 @@ export default function MessagesPage() {
                                             {client.avatar}
                                         </div>
                                         <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${client.status === 'online' ? 'bg-green-500' :
-                                            client.status === 'busy' ? 'bg-red-500' : 'bg-gray-300'
+                                            client.status === 'offline' ? 'bg-red-500' : 'bg-gray-300'
                                             }`}></span>
                                     </div>
                                     <div>
