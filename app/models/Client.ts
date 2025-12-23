@@ -1,6 +1,9 @@
 export type Client = {
-    name?: string,
+    nome?: string,
     avatar?: string;
-    chatId: string;
-    status: 'online' | 'offline'
+    sessionid?: string;
+    chatid: string;
+    ativo: boolean;
+    idconversa: number;
+    idgrupo: number;
 }

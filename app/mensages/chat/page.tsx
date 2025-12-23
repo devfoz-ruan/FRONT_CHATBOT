@@ -27,7 +27,7 @@ export default function ChatPage() {
             chatId: '272485710860428@lid',
             sessionId: "default",
             timestamp: new Date(),
-            tempoEnvio: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestampFormatted: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isVendedor: true
         };
 
@@ -82,7 +82,7 @@ export default function ChatPage() {
                                 className={`text-[10px] mt-2 text-right ${msg.isVendedor ? "text-green-100" : "text-gray-400"
                                     }`}
                             >
-                                {msg.tempoEnvio}
+                                {msg.timestampFormatted}
                             </p>
                         </div>
                     </div>

@@ -1,10 +1,9 @@
 export type Message = {
-    idGrupo: number;
-    sessionId: string;
+    idConversa: number;
     texto: string;
-    chatId: string;
+    idGrupo: number;
     isVendedor: boolean;
-    timestamp: Date;
-    tempoEnvio: string;
+    timestampEnvio: Date;
+    timestampFormatted: string;
 }
 

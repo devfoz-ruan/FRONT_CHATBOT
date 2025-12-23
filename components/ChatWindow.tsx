@@ -14,7 +14,6 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ client, onClose }: ChatWindowProps) {
     const { msgs, setMsgs } = useMessageContext();
-    const idGrupo = 22;
     const [messageText, setMessageText] = useState("");
     const socketConnection = getSocket();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -24,34 +23,32 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
     };
 
     useEffect(() => {
-        socketConnection.emit("join", client.chatId)
+        socketConnection.emit("join", client.chatid)
         socketConnection.on("roomMessage", (message: Message) => {
-            console.log(message)
             setMsgs((prev) => [...prev, message]);
         });
         scrollToBottom();
         return () => {
             socketConnection.off("roomMessage");
-            socketConnection.emit("leave", client.chatId)
+            socketConnection.emit("leave", client.chatid)
         }
-    }, [client.chatId]);
+    }, [client.chatid]);
 
     const handleSendMessage = (roomId: string) => {
         if (messageText.trim() === "") return;
 
         const message: Message = {
             texto: messageText,
-            idGrupo: 22,
-            chatId: client.chatId,
-            sessionId: "default",
-            timestamp: new Date(),
+            idConversa: client.idconversa,
+            idGrupo: client.idgrupo,
+            timestampEnvio: new Date(),
             isVendedor: true,
-            tempoEnvio: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            timestampFormatted: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         console.log(roomId)
         console.log(msgs)
         socketConnection.emit("sendMessage", {
-            roomId: client.chatId,
+            roomId: client.chatid,
             message
         });
         setMessageText("");
@@ -72,14 +69,14 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
                         <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs">
                             {client.avatar}
                         </div>
-                        <span className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border-2 border-white ${client.status === 'online' ? 'bg-green-500' :
-                            client.status === "offline" ? 'bg-red-500' : 'bg-gray-300'
+                        <span className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border-2 border-white ${client.ativo === true ? 'bg-green-500' :
+                            client.ativo === false ? 'bg-red-500' : 'bg-gray-300'
                             }`}></span>
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900 text-sm">{client.name}</h3>
+                        <h3 className="font-bold text-gray-900 text-sm">{client.nome}</h3>
                         <p className="text-xs text-green-600 flex items-center gap-1">
-                            {client.status}
+                            {client.ativo}
                         </p>
                     </div>
                 </div>
@@ -93,9 +90,9 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f8fafc]">
                 {msgs.map((msg) => {
 
-                    if (msg.chatId === client.chatId) return (
+                    if (msg.idConversa === client.idconversa) return (
                         <div
-                            key={msg.timestamp.toString()}
+                            key={msg.timestampEnvio.toString()}
                             className={`flex ${msg.isVendedor ? "justify-end" : "justify-start"}`}
                         >
                             <div
@@ -109,7 +106,7 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
                                     className={`text-[10px] mt-1 text-right ${msg.isVendedor ? "text-green-100" : "text-gray-400"
                                         }`}
                                 >
-                                    {msg.tempoEnvio}
+                                    {msg.timestampFormatted}
                                 </p>
                             </div>
                         </div>
@@ -127,12 +124,12 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
                         type="text"
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(e, client.chatId)}
+                        onKeyDown={(e) => handleKeyDown(e, client.chatid)}
                         placeholder="Mensagem..."
                         className="flex-1 bg-transparent border-none focus:ring-0 text-gray-700 placeholder-gray-400 text-sm px-2"
                     />
                     <button
-                        onClick={() => handleSendMessage(client.chatId)}
+                        onClick={() => handleSendMessage(client.chatid)}
                         className={`p-1.5 rounded-lg transition-all ${messageText.trim()
                             ? "bg-green-600 text-white shadow-md hover:bg-green-700"
                             : "text-gray-400"

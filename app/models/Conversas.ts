@@ -1,5 +1,6 @@
 export type conversas = {
     grupoId: number;
-    sessionId: string;
-    status: "humano" | "bot" | "off";
+    chatId: string;
+    etapa: "humano" | "bot" | "off";
+    status: boolean;
 }

@@ -1,14 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import ChatWindow from "@/components/ChatWindow";
 import FeedPost from "@/components/FeedPost";
 import NewPostInput from "@/components/NewPostInput";
-import ChatWindow from "@/components/ChatWindow";
 import { Search, Filter } from "lucide-react";
-import { useState } from "react";
 import { Client } from "../models/Client";
 
 export default function MessagesPage() {
-    const [selectedClient, setSelectedClient] = useState<any>(null);
+    const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+    const [clientes, setClientes] = useState<Client[]>([]);
+    const grupoid = 1;
+
+    useEffect(() => {
+        async function loadClientes() {
+            try {
+                const response = await fetch(`/api/cliente?grupoid=${grupoid}`);
+                if (!response.ok) throw new Error("Erro ao buscar clientes");
+                const data: Client[] = await response.json();
+                setClientes(data ?? []);
+            } catch (e) {
+                console.error(e);
+                setClientes([]);
+            }
+        }
+
+        loadClientes();
+    }, [grupoid]);
+
+    console.log(clientes)
 
     const posts = [
         {
@@ -21,24 +41,7 @@ export default function MessagesPage() {
             timestamp: "2 horas atrás",
             likes: 12,
             comments: 4
-        },
-        {
-            id: 2,
-            author: {
-                name: "Carlos Oliveira",
-                role: "Suporte Técnico",
-            },
-            content: "Atualização sobre o bug no checkout: Identificamos a causa raiz e o fix já está em deploy. Deve normalizar em 10 minutos. 🔧",
-            timestamp: "4 horas atrás",
-            likes: 8,
-            comments: 2
         }
-    ];
-
-    const clients: Client[] = [
-        { name: "Ruan 22", status: "online", avatar: "TS", chatId: "chat_003" },
-        { name: "Ruan 17", status: "offline", avatar: "GA", chatId: "272485710860428" },
-
     ];
 
     return (
@@ -91,12 +94,12 @@ export default function MessagesPage() {
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-8">
                         <h2 className="font-bold text-gray-900 mb-4 flex items-center justify-between">
                             Clientes
-                            <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{clients.length}</span>
+                            <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{clientes.length}</span>
                         </h2>
                         <div className="space-y-4">
-                            {clients.map((client) => (
+                            {clientes.map((client) => (
                                 <div
-                                    key={client.chatId}
+                                    key={client.chatid}
                                     onClick={() => setSelectedClient(client)}
                                     className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer group"
                                 >
@@ -104,13 +107,13 @@ export default function MessagesPage() {
                                         <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm border-2 border-white shadow-sm group-hover:border-green-100 transition-colors">
                                             {client.avatar}
                                         </div>
-                                        <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${client.status === 'online' ? 'bg-green-500' :
-                                            client.status === 'offline' ? 'bg-red-500' : 'bg-gray-300'
+                                        <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${client.ativo === true ? 'bg-green-500' :
+                                            client.ativo === false ? 'bg-red-500' : 'bg-gray-300'
                                             }`}></span>
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-medium text-gray-900 group-hover:text-green-700 transition-colors">{client.name}</h3>
-                                        <p className="text-xs text-gray-500 capitalize">{client.status}</p>
+                                        <h3 className="text-sm font-medium text-gray-900 group-hover:text-green-700 transition-colors">{client.nome}</h3>
+                                        <p className="text-xs text-gray-500 capitalize">{client.ativo}</p>
                                     </div>
                                 </div>
                             ))}

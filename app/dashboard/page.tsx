@@ -120,7 +120,7 @@ export default function Dashboard() {
                             <div className="flex items-start justify-between">
                                 <div className="flex gap-4">
                                     <div className={`
-                    w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                    w-10 h-10 rounded-full flex items-center justify-center shrink-0
                     ${demand.priority === 'Alta' ? 'bg-red-100 text-red-600' :
                                             demand.priority === 'Média' ? 'bg-yellow-100 text-yellow-600' :
                                                 'bg-green-100 text-green-600'}
