@@ -7,3 +7,12 @@ export type Message = {
     timestampFormatted: string;
 }
 
+export type MessagePayload = {
+    idconversa: number;
+    texto: string;
+    idgrupo: number;
+    isvendedor: boolean;
+    timestampenvio: Date;
+}
+
+

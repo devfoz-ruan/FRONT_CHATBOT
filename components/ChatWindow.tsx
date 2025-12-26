@@ -4,8 +4,9 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { Send, Paperclip, Smile, Image as ImageIcon, MoreVertical, Phone, Video, X, Minimize2 } from "lucide-react";
 import { getSocket } from "@/app/socket";
 import type { Client } from "@/app/models/Client";
-import type { Message } from "@/app/models/Mensagem";
+import type { Message, MessagePayload } from "@/app/models/Mensagem";
 import { useMessageContext } from "@/app/providers/message/useMessageContext";
+import ChatPage from "@/app/grupo/chat/page";
 
 interface ChatWindowProps {
     client: Client;
@@ -16,25 +17,60 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
     const { msgs, setMsgs } = useMessageContext();
     const [messageText, setMessageText] = useState("");
     const socketConnection = getSocket();
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     useEffect(() => {
-        socketConnection.emit("join", client.chatid)
-        socketConnection.on("roomMessage", (message: Message) => {
-            setMsgs((prev) => [...prev, message]);
-        });
-        scrollToBottom();
-        return () => {
-            socketConnection.off("roomMessage");
-            socketConnection.emit("leave", client.chatid)
-        }
-    }, [client.chatid]);
+        let mounted = true;
 
-    const handleSendMessage = (roomId: string) => {
+        socketConnection.emit("join", client.chatid);
+
+        async function loadMessages() {
+            try {
+                const response = await fetch(
+                    `/api/mensagem?idconversa=${client.idconversa}`,
+                    { method: 'GET', credentials: "include" }
+                );
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar mensagens");
+                }
+                const data: MessagePayload[] = await response.json();
+                const dataMessages: Message[] = data.map(payload => ({
+                    idConversa: payload.idconversa,
+                    texto: payload.texto,
+                    idGrupo: payload.idgrupo,
+                    isVendedor: payload.isvendedor,
+                    timestampEnvio: new Date(payload.timestampenvio),
+                    timestampFormatted: new Date(payload.timestampenvio)
+                        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }));
+                if (mounted) {
+                    setMsgs(dataMessages);
+                }
+            } catch (e) {
+                console.error(e);
+                if (mounted) setMsgs([]);
+            }
+        }
+        loadMessages();
+        scrollToBottom();
+        const handleRoomMessage = (message: Message) => {
+            setMsgs(prev => [...prev, message]);
+        };
+        socketConnection.on("roomMessage", handleRoomMessage);
+        return () => {
+            mounted = false;
+            socketConnection.off("roomMessage", handleRoomMessage);
+            socketConnection.emit("leave", client.chatid);
+        };
+    }, [client.chatid, client.idconversa]);
+
+
+    const handleSendMessage = () => {
         if (messageText.trim() === "") return;
 
         const message: Message = {
@@ -45,8 +81,6 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
             isVendedor: true,
             timestampFormatted: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
-        console.log(roomId)
-        console.log(msgs)
         socketConnection.emit("sendMessage", {
             roomId: client.chatid,
             message
@@ -56,7 +90,7 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, clientid: string) => {
         if (e.key === "Enter") {
-            handleSendMessage(clientid);
+            handleSendMessage();
         }
     };
 
@@ -129,7 +163,7 @@ export default function ChatWindow({ client, onClose }: ChatWindowProps) {
                         className="flex-1 bg-transparent border-none focus:ring-0 text-gray-700 placeholder-gray-400 text-sm px-2"
                     />
                     <button
-                        onClick={() => handleSendMessage(client.chatid)}
+                        onClick={() => handleSendMessage}
                         className={`p-1.5 rounded-lg transition-all ${messageText.trim()
                             ? "bg-green-600 text-white shadow-md hover:bg-green-700"
                             : "text-gray-400"

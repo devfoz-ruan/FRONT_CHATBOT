@@ -2,44 +2,93 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Send, Paperclip, Smile, Image as ImageIcon, MoreVertical, Phone, Video } from "lucide-react";
-import { Message } from "@/app/models/Mensagem";
+import { Message, MessagePayload } from "@/app/models/Mensagem";
+import { useMessageContext } from "@/app/providers/message/useMessageContext";
+import { getSocket } from "@/app/socket";
 import { Client } from "@/app/models/Client";
 
-export default function ChatPage() {
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [newMessage, setNewMessage] = useState("");
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+interface ChatPageProps {
+    client: Client;
+}
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
-    const handleSendMessage = () => {
-        if (newMessage.trim() === "") return;
-
-        const message: Message = {
-            texto: newMessage,
-            idGrupo: 22,
-            chatId: '272485710860428@lid',
-            sessionId: "default",
-            timestamp: new Date(),
-            timestampFormatted: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isVendedor: true
+export default function ChatPage({ client}: ChatPageProps) {
+        const { msgs, setMsgs } = useMessageContext();
+        const [messageText, setMessageText] = useState("");
+        const socketConnection = getSocket();
+        const messagesEndRef = useRef<HTMLDivElement>(null)
+    
+        const scrollToBottom = () => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         };
-
-        setMessages([...messages, message]);
-        setNewMessage("");
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            handleSendMessage();
-        }
-    };
+    
+        useEffect(() => {
+            let mounted = true;
+    
+            socketConnection.emit("join", client.chatid);
+    
+            async function loadMessages() {
+                try {
+                    const response = await fetch(
+                        `/api/mensagem?idconversa=${client.idconversa}`
+                    );
+                    if (!response.ok) {
+                        throw new Error("Erro ao buscar mensagens");
+                    }
+                    const data: MessagePayload[] = await response.json();
+                    const dataMessages: Message[] = data.map(payload => ({
+                        idConversa: payload.idconversa,
+                        texto: payload.texto,
+                        idGrupo: payload.idgrupo,
+                        isVendedor: payload.isvendedor,
+                        timestampEnvio: new Date(payload.timestampenvio),
+                        timestampFormatted: new Date(payload.timestampenvio)
+                            .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    }));
+                    if (mounted) {
+                        setMsgs(dataMessages);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    if (mounted) setMsgs([]);
+                }
+            }
+            loadMessages();
+            const handleRoomMessage = (message: Message) => {
+                setMsgs(prev => [...prev, message]);
+            };
+            socketConnection.on("roomMessage", handleRoomMessage);
+            return () => {
+                mounted = false;
+                socketConnection.off("roomMessage", handleRoomMessage);
+                socketConnection.emit("leave", client.chatid);
+            };
+        }, [client.chatid, client.idconversa]);
+    
+    
+        const handleSendMessage = () => {
+            if (messageText.trim() === "") return;
+    
+            const message: Message = {
+                texto: messageText,
+                idConversa: client.idconversa,
+                idGrupo: client.idgrupo,
+                timestampEnvio: new Date(),
+                isVendedor: true,
+                timestampFormatted: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            socketConnection.emit("sendMessage", {
+                roomId: client.chatid,
+                message
+            });
+            setMessageText("");
+        };
+    
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, clientid: string) => {
+            if (e.key === "Enter") {
+                handleSendMessage();
+            }
+        };
+    
 
     return (
         <div className="flex flex-col h-screen bg-gray-50 max-w-4xl mx-auto shadow-xl rounded-2xl overflow-hidden my-4 border border-gray-100">
@@ -66,9 +115,9 @@ export default function ChatPage() {
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#f8fafc]">
-                {messages.map((msg) => (
+                {msgs.map((msg) => (
                     <div
-                        key={msg.chatId + msg.timestamp}
+                        key={msg.timestampEnvio.toISOString()}
                         className={`flex ${msg.isVendedor ? "justify-end" : "justify-start"}`}
                     >
                         <div
@@ -104,9 +153,9 @@ export default function ChatPage() {
 
                     <input
                         type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyDown={handleKeyDown}
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        onKeyDown={(e)=> handleKeyDown(e, client.chatid)}
                         placeholder="Digite sua mensagem..."
                         className="flex-1 bg-transparent border-none focus:ring-0 text-gray-700 placeholder-gray-400"
                     />
@@ -117,11 +166,11 @@ export default function ChatPage() {
                         </button>
                         <button
                             onClick={handleSendMessage}
-                            className={`p-2 rounded-xl transition-all ${newMessage.trim()
+                            className={`p-2 rounded-xl transition-all ${messageText.trim()
                                 ? "bg-green-600 text-white shadow-lg shadow-green-200 hover:bg-green-700"
                                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
                                 }`}
-                            disabled={!newMessage.trim()}
+                            disabled={!messageText.trim()}
                         >
                             <Send size={18} />
                         </button>

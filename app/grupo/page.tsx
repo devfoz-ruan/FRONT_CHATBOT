@@ -12,10 +12,13 @@ export default function MessagesPage() {
     const [clientes, setClientes] = useState<Client[]>([]);
     const grupoid = 1;
 
+
     useEffect(() => {
         async function loadClientes() {
             try {
-                const response = await fetch(`/api/cliente?grupoid=${grupoid}`);
+                const response = await fetch(`/api/cliente?grupoid=${grupoid}`, {
+                    credentials: "include"
+                });
                 if (!response.ok) throw new Error("Erro ao buscar clientes");
                 const data: Client[] = await response.json();
                 setClientes(data ?? []);
@@ -70,7 +73,7 @@ export default function MessagesPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Main Content - Feed */}
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-2">
                     {/* New Post Input */}
                     <NewPostInput />
 
@@ -90,14 +93,14 @@ export default function MessagesPage() {
                 </div>
 
                 {/* Sidebar - Clients */}
-                <div className="lg:col-span-1">
+                <div className="lg:col-span-2">
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-8">
                         <h2 className="font-bold text-gray-900 mb-4 flex items-center justify-between">
                             Clientes
                             <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{clientes.length}</span>
                         </h2>
                         <div className="space-y-4">
-                            {clientes.map((client) => (
+                            {(clientes??[]).map((client) => (
                                 <div
                                     key={client.chatid}
                                     onClick={() => setSelectedClient(client)}

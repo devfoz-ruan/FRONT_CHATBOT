@@ -18,9 +18,9 @@ export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
 
     const menuItems = [
-        { icon: LayoutDashboard, label: "Visão Geral", href: "/dashboard" },
-        { icon: MessageSquare, label: "Demandas", href: "/mensages" },
-        { icon: Users, label: "Meu Grupo", href: "/group" },
+        { icon: LayoutDashboard, label: "Visão Geral", href: "/" },
+        { icon: MessageSquare, label: "Demandas", href: "/dashboard" },
+        { icon: Users, label: "Meus Grupos", href: "/grupo" },
         { icon: Settings, label: "Configurações", href: "/dashboard/settings" },
     ];
 
