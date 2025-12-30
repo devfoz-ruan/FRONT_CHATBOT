@@ -1,32 +1,30 @@
 import { MessageSquare, Heart, Share2, MoreHorizontal } from "lucide-react";
 
 interface FeedPostProps {
-    author: {
-        name: string;
-        role: string;
-        avatar?: string;
-    };
+    name: string;
+    role: string;
+    avatar?: string;
     content: string;
     timestamp: string;
     likes: number;
     comments: number;
 }
 
-export default function FeedPost({ author, content, timestamp, likes, comments }: FeedPostProps) {
+export default function FeedPost({ name, role, avatar, content, timestamp, likes, comments }: FeedPostProps) {
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-linear-to-br from-green-100 to-yellow-100 flex items-center justify-center border-2 border-white shadow-sm">
-                        {author.avatar ? (
-                            <img src={author.avatar} alt={author.name} className="w-full h-full rounded-full object-cover" />
+                        {avatar ? (
+                            <img src={avatar} alt={name} className="w-full h-full rounded-full object-cover" />
                         ) : (
-                            <span className="text-lg font-bold text-green-700">{author.name.charAt(0)}</span>
+                            <span className="text-lg font-bold text-green-700">{name.charAt(0)}</span>
                         )}
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900">{author.name}</h3>
-                        <p className="text-xs text-gray-500">{author.role} • {timestamp}</p>
+                        <h3 className="font-bold text-gray-900">{name}</h3>
+                        <p className="text-xs text-gray-500">{role} • {timestamp}</p>
                     </div>
                 </div>
                 <button className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-50 rounded-full transition-colors">

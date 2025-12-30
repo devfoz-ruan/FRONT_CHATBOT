@@ -20,7 +20,7 @@ export default function Sidebar() {
     const menuItems = [
         { icon: LayoutDashboard, label: "Visão Geral", href: "/" },
         { icon: MessageSquare, label: "Demandas", href: "/dashboard" },
-        { icon: Users, label: "Meus Grupos", href: "/grupo" },
+        { icon: Users, label: "Meus Grupos", href: "/grupos" },
         { icon: Settings, label: "Configurações", href: "/dashboard/settings" },
     ];
 

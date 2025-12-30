@@ -3,18 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const cookieStore = await cookies(); // ✅ await
-    const { searchParams } = new URL(req.url);
-    const grupoid = searchParams.get("grupoid");
 
-    if (!grupoid) {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id')
+    console.log("id recebido:", id);
+
+        const cookieStore = await cookies(); // ✅ await
+    if (!id) {
       return NextResponse.json(
-        { erro: "grupoid é obrigatório" },
+        { erro: "sem id no local storege" },
         { status: 400 }
       );
     }
-
-    console.log("grupoid recebido:", grupoid);
 
     // ✅ montar header Cookie corretamente
     const cookieHeader = cookieStore
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       .join("; ");
 
     const response = await fetch(
-      `${process.env.BASE_URL}/cliente/${grupoid}`,
+      `${process.env.BASE_URL}/grupo/${id}`,
       {
         method: "GET",
         headers: {
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(data);
 
   } catch (e) {
-    console.error("Erro /api/cliente:", e);
+    console.error("Erro /api/grupo:", e);
     return NextResponse.json(
       { erro: "Erro interno no servidor" },
       { status: 500 }

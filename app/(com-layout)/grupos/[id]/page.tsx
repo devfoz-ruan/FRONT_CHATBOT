@@ -5,14 +5,27 @@ import ChatWindow from "@/components/ChatWindow";
 import FeedPost from "@/components/FeedPost";
 import NewPostInput from "@/components/NewPostInput";
 import { Search, Filter } from "lucide-react";
-import { Client } from "../models/Client";
+import { Posts } from "@/app/models/Posts";
+import { Client } from "@/app/models/Client";
+
+import { useParams, useSearchParams} from "next/navigation";
+
+import { useMessageContext } from "../../../providers/message/useMessageContext";
+import { usePostsContext } from "@/app/providers/posts/usePostsContext";
 
 export default function MessagesPage() {
+
+    const params = useParams();
+    const grupoid = params.id as string;
+
+    const searchParams = useSearchParams();
+    const nome = searchParams.get("nome")
+
+    const { msgs } = useMessageContext();
+    const {Posts, setPosts } = usePostsContext();
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-    const [clientes, setClientes] = useState<Client[]>([]);
-    const grupoid = 1;
-
-
+    const [clientes, setClientes] = useState<Client[]>([]) ;
+    
     useEffect(() => {
         async function loadClientes() {
             try {
@@ -28,31 +41,30 @@ export default function MessagesPage() {
             }
         }
 
-        loadClientes();
-    }, [grupoid]);
-
-    console.log(clientes)
-
-    const posts = [
-        {
-            id: 1,
-            author: {
-                name: "Ruan Rubino",
-                role: "Gerente de Contas",
-            },
-            content: "Pessoal, acabamos de fechar o contrato com a Tech Solutions! 🎉\nPrecisamos alinhar o onboarding até sexta-feira. Quem pode assumir essa demanda?",
-            timestamp: "2 horas atrás",
-            likes: 12,
-            comments: 4
+        async function loadPosts() {
+            try {
+                const responsePosts = await fetch(`/api/posts?grupoid=${grupoid}`, {
+                    credentials: "include"
+                });
+                if (!responsePosts.ok) throw new Error("Erro ao buscar posts");
+                const posts: Posts[] = await responsePosts.json();
+                console.log("Posts carregados:", posts);
+                setPosts(posts ?? []);
+            } catch (e) {
+                console.error(e);
+                setPosts([]);
+            }
         }
-    ];
+        loadPosts();
+        loadClientes();
+}, [grupoid, msgs]);
 
     return (
         <div className="max-w-7xl mx-auto p-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Grupo de Vendas</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">{nome}</h1>
                     <p className="text-gray-500 mt-1">Compartilhe atualizações e colabore com seu time.</p>
                 </div>
 
@@ -79,14 +91,15 @@ export default function MessagesPage() {
 
                     {/* Feed */}
                     <div className="space-y-6">
-                        {posts.map((post) => (
+                        {Posts.map((post) => (
                             <FeedPost
                                 key={post.id}
-                                author={post.author}
-                                content={post.content}
-                                timestamp={post.timestamp}
+                                name={post.nome}
+                                role={post.cargo}
+                                content={post.texto}
+                                timestamp={new Date(post.timestamp).toLocaleString()}
                                 likes={post.likes}
-                                comments={post.comments}
+                                comments={post.total_comentarios}
                             />
                         ))}
                     </div>

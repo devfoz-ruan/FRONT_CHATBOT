@@ -132,7 +132,7 @@ export default function CadastroPage() {
                         </div>
 
                         {/* Conditional Fields for Vendedor */}
-                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isVendedor ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isVendedor ? 'max-h-125 opacity-100' : 'max-h-0 opacity-0'}`}>
                             <div className="space-y-5 pt-2 pb-2 pl-4 border-l-2 border-emerald-100 ml-1">
 
                                 {/* Section Title */}

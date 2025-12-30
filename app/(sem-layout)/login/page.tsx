@@ -16,7 +16,7 @@ export default function LoginPage() {
         email: "",
         senha: ""
     });
-
+    const emailLowercase = formData.email.toLowerCase();
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -29,15 +29,20 @@ export default function LoginPage() {
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({
-                email: formData.email,
+                email: emailLowercase,
                 senha: formData.senha
             })
         })
+        const data = await response.json();
+        console.log(data);
+        localStorage.setItem('dataUser', String(data.id));
+        localStorage.setItem('userName', data.nome);
+        localStorage.setItem('userPerm', String(data.permissoes));
+        
         if (response.ok) {
-            router.replace('/dashboard');
+            router.replace('/grupos');
         } else {
             console.log('Erro no login');
-
         }
         // Add logic to submit login
     };

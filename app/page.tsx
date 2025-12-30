@@ -21,9 +21,11 @@ export default function Home() {
               <a href="#features" className="text-gray-600 hover:text-green-600 transition-colors">Recursos</a>
               <a href="#about" className="text-gray-600 hover:text-green-600 transition-colors">Sobre</a>
               <a href="#contact" className="text-gray-600 hover:text-green-600 transition-colors">Contato</a>
+              <a href="/login">
               <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-lg shadow-green-200 hover:shadow-green-300">
                 Começar Agora
               </button>
+              </a>
             </div>
           </div>
         </div>

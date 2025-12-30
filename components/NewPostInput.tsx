@@ -4,13 +4,13 @@ export default function NewPostInput() {
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
             <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex-shrink-0 border-2 border-white shadow-sm flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-gray-100 shrink-0 border-2 border-white shadow-sm flex items-center justify-center">
                     <span className="font-bold text-gray-600">EU</span>
                 </div>
                 <div className="flex-1">
                     <textarea
                         placeholder="No que você está pensando? Compartilhe com o grupo..."
-                        className="w-full bg-gray-50 border-none rounded-xl p-4 min-h-[100px] focus:ring-2 focus:ring-green-500/20 resize-none text-gray-700 placeholder-gray-400"
+                        className="w-full bg-gray-50 border-none rounded-xl p-4 min-h-25 focus:ring-2 focus:ring-green-500/20 resize-none text-gray-700 placeholder-gray-400"
                     />
                     <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center gap-2">
