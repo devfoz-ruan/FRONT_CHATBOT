@@ -11,6 +11,7 @@ import {
 
 
 export default function LoginPage() {
+    const [resultLogin, setResultLogin] = useState<boolean| null>(null);
     const router = useRouter()
     const [formData, setFormData] = useState({
         email: "",
@@ -33,16 +34,21 @@ export default function LoginPage() {
                 senha: formData.senha
             })
         })
-        const data = await response.json();
-        console.log(data);
-        localStorage.setItem('dataUser', String(data.id));
-        localStorage.setItem('userName', data.nome);
-        localStorage.setItem('userPerm', String(data.permissoes));
-        
         if (response.ok) {
-            router.replace('/grupos');
+            const data = await response.json();
+            console.log(data);
+            localStorage.setItem('dataUser', String(data.id));
+            localStorage.setItem('userName', data.nome);
+            localStorage.setItem('userPerm', String(data.permissoes));
+
+            setTimeout(() => {
+                router.replace('/grupos');
+            }, 1000);
+            setResultLogin(true);
+
         } else {
-            console.log('Erro no login');
+            console.log('Login failed');
+            setResultLogin(false);
         }
         // Add logic to submit login
     };
@@ -113,7 +119,22 @@ export default function LoginPage() {
                                 </a>
                             </div>
                         </div>
+                        {
+                            resultLogin === false && (
+                                <div className="p-4 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm text-center">
+                                    Email ou senha incorretos. Tente novamente.
+                                </div>
+                            )
+                        }
 
+                        {
+                            resultLogin === true && (
+                                <div className="p-4 bg-green-500 border border-green-500 text-white rounded-lg text-sm text-center">
+                                    
+                                    <p>Carregando...</p>
+                                </div>
+                             )
+                        } 
                         {/* Action Buttons */}
                         <div className="pt-2">
                             <button

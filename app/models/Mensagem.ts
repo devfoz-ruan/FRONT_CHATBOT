@@ -1,4 +1,7 @@
+import { UUID } from "crypto";
+
 export type Message = {
+    id:UUID;
     idConversa: number;
     texto: string;
     idGrupo: number;
@@ -8,6 +11,7 @@ export type Message = {
 }
 
 export type MessagePayload = {
+    id:UUID;
     idconversa: number;
     texto: string;
     idgrupo: number;

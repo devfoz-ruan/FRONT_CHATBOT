@@ -9,3 +9,10 @@ export type Posts = {
     iscomentario: boolean
     total_comentarios: number
 }
+export type PostPayload = {
+    idgrupo: number,
+    idvendedor: number,
+    texto: string,
+    timestamp: Date,
+    iscomentario: boolean
+}

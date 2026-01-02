@@ -49,46 +49,71 @@ export async function GET(req: NextRequest) {
 }
 
 
+
 export async function POST(req: NextRequest) {
-    try {
-        const body = await req.json();
-        const { idpost, idgrupo, idvendedor, texto, timestamp, iscomentario} = body;
+  try {
+    const cookieStore = await cookies();
+    const body = await req.json();
 
-        if (!idgrupo || !idvendedor|| !texto || !timestamp || !iscomentario || !idpost) {
-            return NextResponse.json(
-                { error: 'Todos os campos sao obrigatórios' },
-                { status: 400 }
-            );
-        }
+    const { idgrupo, idvendedor, texto, timestamp, iscomentario } = body;
 
-        const backendRes = await fetch(`${process.env.BASE_URL}/posts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({idpost, idgrupo, idvendedor, texto, timestamp, iscomentario})
-        });
-
-        // Repassa erro do backend
-        if (!backendRes.ok) {
-            const err = await backendRes.text();
-            return NextResponse.json(
-                { error: err },
-                { status: backendRes.status }
-            );
-        }
-
-        // ⚠️ MUITO IMPORTANTE
-        // Repassa headers (Set-Cookie) para o browser
-        return new NextResponse(backendRes.body, {
-            status: backendRes.status,
-            headers: backendRes.headers
-        });
-
-    } catch (err) {
-        console.error('Erro proxy login:', err);
-        return NextResponse.json(
-            { error: 'Payload inválido' },
-            { status: 400 }
-        );
+    // ✅ validação correta
+    if (
+      !idgrupo ||
+      !idvendedor ||
+      !texto ||
+      !timestamp ||
+      iscomentario === undefined
+    ) {
+      return NextResponse.json(
+        { error: "Todos os campos são obrigatórios" },
+        { status: 400 }
+      );
     }
+
+    // ✅ repassa cookies para o backend (auth)
+    const cookieHeader = cookieStore
+      .getAll()
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
+
+    const backendRes = await fetch(`${process.env.BASE_URL}/posts`, {
+      method: "POST",
+      headers: {
+        Cookie: cookieHeader,
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        idvendedor:idvendedor,
+        idgrupo:idgrupo,
+        texto : texto,
+        timestamp: timestamp,
+        iscomentario: iscomentario
+      })
+    });
+
+    // ❌ erro vindo do backend
+    if (!backendRes.ok) {
+      const errText = await backendRes.text();
+      return NextResponse.json(
+        { error: errText || "Erro no backend" },
+        { status: backendRes.status }
+      );
+    }
+
+    // ✅ backend DEVE retornar o post criado
+    const data = await backendRes.json();
+
+    // ✅ frontend usa response.json()
+    return NextResponse.json(data, { status: backendRes.status });
+
+  } catch (err) {
+    console.error("Erro /api/posts:", err);
+    return NextResponse.json(
+      { error: "Erro interno no servidor" },
+      { status: 500 }
+    );
+  }
 }
+

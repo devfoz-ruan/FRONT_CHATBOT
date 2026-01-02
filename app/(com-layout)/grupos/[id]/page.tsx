@@ -5,59 +5,30 @@ import ChatWindow from "@/components/ChatWindow";
 import FeedPost from "@/components/FeedPost";
 import NewPostInput from "@/components/NewPostInput";
 import { Search, Filter } from "lucide-react";
-import { Posts } from "@/app/models/Posts";
 import { Client } from "@/app/models/Client";
-
 import { useParams, useSearchParams} from "next/navigation";
-
 import { useMessageContext } from "../../../providers/message/useMessageContext";
 import { usePostsContext } from "@/app/providers/posts/usePostsContext";
+import { loadPosts } from "@/app/utils/load/loadPosts";
+import { loadClientes } from "@/app/utils/load/loadClients";
 
 export default function MessagesPage() {
 
     const params = useParams();
-    const grupoid = params.id as string;
+    const idgrupo = params.id as string;
 
     const searchParams = useSearchParams();
     const nome = searchParams.get("nome")
 
     const { msgs } = useMessageContext();
-    const {Posts, setPosts } = usePostsContext();
-    const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+    const {Posts, setPosts} = usePostsContext();
+    const [selectedClient, setSelectedClient] = useState<Client[]| null>(null);
     const [clientes, setClientes] = useState<Client[]>([]) ;
-    
-    useEffect(() => {
-        async function loadClientes() {
-            try {
-                const response = await fetch(`/api/cliente?grupoid=${grupoid}`, {
-                    credentials: "include"
-                });
-                if (!response.ok) throw new Error("Erro ao buscar clientes");
-                const data: Client[] = await response.json();
-                setClientes(data ?? []);
-            } catch (e) {
-                console.error(e);
-                setClientes([]);
-            }
-        }
 
-        async function loadPosts() {
-            try {
-                const responsePosts = await fetch(`/api/posts?grupoid=${grupoid}`, {
-                    credentials: "include"
-                });
-                if (!responsePosts.ok) throw new Error("Erro ao buscar posts");
-                const posts: Posts[] = await responsePosts.json();
-                console.log("Posts carregados:", posts);
-                setPosts(posts ?? []);
-            } catch (e) {
-                console.error(e);
-                setPosts([]);
-            }
-        }
-        loadPosts();
-        loadClientes();
-}, [grupoid, msgs]);
+    useEffect(() => {
+        loadPosts(idgrupo, setPosts);
+        loadClientes(idgrupo, setClientes);
+}, [idgrupo, msgs]);
 
     return (
         <div className="max-w-7xl mx-auto p-8">

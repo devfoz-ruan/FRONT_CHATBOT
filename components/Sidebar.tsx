@@ -17,6 +17,9 @@ export default function Sidebar() {
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
 
+    const name = localStorage.getItem("userName") || "Usuário";
+    const permission = localStorage.getItem("userPerm") || "0";
+
     const menuItems = [
         { icon: LayoutDashboard, label: "Visão Geral", href: "/" },
         { icon: MessageSquare, label: "Demandas", href: "/dashboard" },
@@ -90,8 +93,8 @@ export default function Sidebar() {
                     </div>
                     {!collapsed && (
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">João da Silva</p>
-                            <p className="text-xs text-gray-500 truncate">Suporte Nível 1</p>
+                            <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
+                            <p className="text-xs text-gray-500 truncate">Suporte Nível {permission}</p>
                         </div>
                     )}
                     {!collapsed && (

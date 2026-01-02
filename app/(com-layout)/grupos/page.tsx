@@ -2,8 +2,6 @@
 
 import { Grupo } from "@/app/models/Grupo";
 import { Card, CardContent } from "@/components/Cards";
-import FeedPost from "@/components/FeedPost";
-import { link } from "fs";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -27,11 +25,6 @@ export default function HomePage() {
         }
         loadGrupos();           
 }, []);
-
-    function openGrupoPage(id: number): void {
-        throw new Error("Function not implemented.");
-    }
-
     return (
         <>
         
